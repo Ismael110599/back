@@ -58,4 +58,6 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+console.log(`Servidor corriendo en puerto ${process.env.PORT || 5000}, MODO = ${process.env.NODE_ENV || 'development'}`);
+
 module.exports = app;
