@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var db = require('./conexion/mogoose')
+const cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -28,6 +29,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+const corsOptions = {
+  origin: '*',
+  allowedHeaders: ['Content-Type', 'Authorization', 'auth-token', 'auth-admin'],
+}; 
+ app.use(cors(corsOptions));
 
 /// router
 app.use('/', indexRouter);
