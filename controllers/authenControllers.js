@@ -1,20 +1,23 @@
 const Autentificacion = require('../models/authenticationModels');
-const User = require('../models/userModel');
+const User = require('../models/user.Model');
 
 exports.createAuthentication = async (req, res) => {
   try {
-    const { correo, contrasenia, usuarioId } = req.body;
+    const { name, lastName, phone, email, address, password} = req.body;
 
     // Verifica que el usuario exista
-    const usuarioExistente = await User.findById(usuarioId);
+    const usuarioExistente = await User.findOne({ email: req.body.email});
     if (!usuarioExistente) {
       return res.status(400).json({ error: 'Usuario no encontrado' });
     }
 
     const nuevaAutentificacion = new Autentificacion({
-      correo,
-      contrasenia,
-      usuario: usuarioId,
+      name,
+      lastName,
+      phone,
+      email,
+      address,
+      password
     });
 
     const autentificacion = await nuevaAutentificacion.save();
