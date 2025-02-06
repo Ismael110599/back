@@ -7,6 +7,7 @@ const CaretakerSchema = new mongoose.Schema({
         type: { type: String, default: 'Point' },
         coordinates: { type: [Number], required: true } // [longitud, latitud]
     },
+    description: { type: String, default:""},
     availability: [{ startDate: Date, endDate: Date }],
     rating: { type: Number, default: 0 },
     reviewCount: { type: Number, default: 0 }

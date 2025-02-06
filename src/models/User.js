@@ -8,6 +8,11 @@ const UserSchema = new mongoose.Schema({
     phone: String,
     address: String,
     pets: [{ name: String, type: String, age: Number }],
+    role: {
+        type: String,
+        enum: ['admin', 'user', 'caregiver'],
+        default: 'user'
+    }
 }, { timestamps: true });
 
 // Hashear la contraseña antes de guardar

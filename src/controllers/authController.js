@@ -8,7 +8,7 @@ exports.register = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return sendResponse(res, COD_ERR, 400, "Errores de validación", errors.array());
 
-    const { name, email, password, phone, address } = req.body;
+    const { name, email, password, phone, address, pets } = req.body;
 
     try {
         let user = await User.findOne({ email });
