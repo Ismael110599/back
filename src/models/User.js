@@ -7,7 +7,13 @@ const UserSchema = new mongoose.Schema({
     password: { type: String, required: true },
     phone: String,
     address: String,
-    pets: [{ name: String, type: String, age: Number }],
+    pets: [
+        {
+            name: { type: String, required: true },
+            type: { type: String, required: true },
+            age: { type: Number, required: true }
+        }
+    ],
     role: {
         type: String,
         enum: ['admin', 'user', 'caregiver'],

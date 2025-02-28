@@ -39,3 +39,26 @@ exports.getNearbyCaretakers = async (req, res) => {
         res.status(500).json({ error: 'Error al buscar cuidadores cercanos' });
     }
 };
+
+
+exports.postregisterCaretaker = async (req, res) => {
+    try {
+        const { name, email, availability, lat, lng } = req.body;
+
+        if (!name || !email || !availability || availability.length === 0 || !lat || !lng) {
+            return sendResponse(res, COD_ERR, 400, "Todos los campos son obligatorios");
+        }
+
+        const newCaretaker = new Caretaker({
+            name,
+            email,
+            availability,
+            location: { type: "Point", coordinates: [parseFloat(lng), parseFloat(lat)] }
+        });
+
+        await newCaretaker.save();
+        return sendResponse(res, COD_OK, 201, "Cuidador registrado con éxito", newCaretaker);
+    } catch (error) {
+        return sendResponse(res, COD_ERR, 500, "Error al registrar cuidador");
+    }
+};

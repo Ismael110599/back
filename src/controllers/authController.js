@@ -14,7 +14,7 @@ exports.register = async (req, res) => {
         let user = await User.findOne({ email });
         if (user) return sendResponse(res, COD_ERR, 400, "El correo ya está registrado");
 
-        user = new User({ name, email, password, phone, address });
+        user = new User({ name, email, password, phone, address, pets });
         await user.save();
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -34,6 +34,8 @@ exports.login = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (!user) return sendResponse(res, COD_ERR, 400, "Usuario no encontrado");
+
+        
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return sendResponse(res, COD_ERR, 400, "Credenciales incorrectas");

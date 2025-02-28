@@ -9,6 +9,7 @@ const userRoutes = require('./routes/userRoutes');
 const caretakerRoutes = require('./routes/caretakerRoutes')
 const stayRoutes = require('./routes/stayRoutes');
 
+
 require('dotenv').config();
 
 connectDB();
@@ -32,5 +33,6 @@ app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/caretakers', caretakerRoutes);
 app.use('/stays', stayRoutes);
+
 
 module.exports = app;
