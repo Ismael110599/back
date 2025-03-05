@@ -8,6 +8,9 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const caretakerRoutes = require('./routes/caretakerRoutes')
 const stayRoutes = require('./routes/stayRoutes');
+const notificationRoutes = require('./routes/notificationsRoutes')
+const {verifyToken} = require('./middleware/auth');
+
 
 
 require('dotenv').config();
@@ -33,6 +36,6 @@ app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/caretakers', caretakerRoutes);
 app.use('/stays', stayRoutes);
-
+app.use('/notifications', notificationRoutes);
 
 module.exports = app;
