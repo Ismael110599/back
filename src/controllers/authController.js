@@ -8,13 +8,13 @@
         const errors = validationResult(req);
         if (!errors.isEmpty()) return sendResponse(res, COD_ERR, 400, "Errores de validación", errors.array());
 
-        const { name, email, password, phone, address, pets } = req.body;
+        const { name, email, password, phone, address, pets, role } = req.body;
 
         try {
             let user = await User.findOne({ email });
             if (user) return sendResponse(res, COD_ERR, 400, "El correo ya está registrado");
 
-            user = new User({ name, email, password, phone, address, pets });
+            user = new User({ name, email, password, phone, address, pets, role });
             await user.save();
 
             const token = jwt.sign(
