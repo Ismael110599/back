@@ -1,8 +1,12 @@
+require('dotenv').config();
+
 const express = require('express');
 const { requestLogger } = require('./middleware/logger');
 const connectDB = require('./config/db');
 const morgan = require('morgan');
 const cors  = require('cors');
+
+
 
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -13,7 +17,7 @@ const {verifyToken} = require('./middleware/auth');
 
 
 
-require('dotenv').config();
+
 
 connectDB();
 
