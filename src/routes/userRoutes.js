@@ -5,6 +5,6 @@ const { verifyToken } = require('../middleware/auth');
 const router = express.Router();
 
 router.get('/profile', verifyToken, getProfile);
-router.post('/profile', verifyToken, updateProfile); // Ahora la función updateProfile está definida
+router.put('/update', verifyToken, updateProfile); // Ahora la función updateProfile está definida
 router.get('/list', getUsers); // Ruta para obtener los usuarios
 module.exports = router;
