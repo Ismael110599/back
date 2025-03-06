@@ -3,7 +3,6 @@ module.exports = {
         name: 'BACKEND-PROYECTO-WEB',
         script: 'src/server.js',
 
-        // Gestión Avanzada de Reinicios
         watch: ['src'], // Para reiniciar si hay cambios en el código fuente
         ignore_watch: ['node_modules', 'logs', '*.log'], 
         autorestart: true, 

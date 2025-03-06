@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { sendResponse, COD_OK, COD_ERR } = require('../utils/response');
-
-
+const upload = require('../middleware/upload');
+const cloudinary = require('../config/cloudinary');
 
 exports.getProfile = async (req, res) => {
     try {
@@ -15,54 +15,90 @@ exports.getProfile = async (req, res) => {
     }
 };
 
-// Método para actualizar el perfil del usuario
 exports.updateProfile = async (req, res) => {
     try {
         const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
-
         if (!token) {
             return sendResponse(res, COD_ERR, 401, "Token de autenticación no proporcionado");
         }
 
-        // Verificar y decodificar el token
         jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
             if (err) {
                 return sendResponse(res, COD_ERR, 401, "Token inválido o expirado");
             }
 
-            // Obtener el usuario usando el ID del token decodificado
             const user = await User.findById(decoded.id);
             if (!user) return sendResponse(res, COD_ERR, 404, "Usuario no encontrado");
 
-            const { name, phone, address, pets, removePet } = req.body;
+            upload.single('profilePicture')(req, res, async (uploadErr) => {
+                if (uploadErr) {
+                    if (uploadErr.code === 'LIMIT_FILE_SIZE') {
+                        return sendResponse(res, COD_ERR, 400, "La imagen excede el límite de 5MB");
+                    }
+                    return sendResponse(res, COD_ERR, 400, uploadErr.message || "Error al subir la imagen");
+                }
 
-            // Actualizar los campos del perfil
-            user.name = name || user.name;
-            user.phone = phone || user.phone;
-            user.address = address || user.address;
+                const { name, phone, address, pets, removePet } = req.body;
 
-            // Si 'removePet' está presente, eliminar la mascota correspondiente
-            if (removePet) {
-                user.pets = user.pets.filter(pet => pet.name !== removePet);
-            }
+                user.name = name || user.name;
+                user.phone = phone || user.phone;
+                user.address = address || user.address;
 
-            // Si 'pets' está presente, actualizar la lista de mascotas
-            if (pets) user.pets = pets;
+                if (removePet) {
+                    user.pets = user.pets.filter(pet => pet.name !== removePet);
+                }
 
-            // Guardar los cambios
-            await user.save();
+                if (pets) {
+                    try {
+                        user.pets = JSON.parse(pets);
+                    } catch (e) {
+                        user.pets = pets;
+                    }
+                }
 
-            return sendResponse(res, COD_OK, 200, "Perfil actualizado correctamente", user);
+                if (req.file) {
+                    try {
+                        // Subir la imagen a Cloudinary y esperar el resultado
+                        const result = await new Promise((resolve, reject) => {
+                            const stream = cloudinary.uploader.upload_stream(
+                                { folder: 'uploads' },
+                                (error, result) => {
+                                    if (error) reject(error);
+                                    else resolve(result);
+                                }
+                            );
+                            stream.end(req.file.buffer);
+                        });
+
+                        console.log('URL de Cloudinary:', result.secure_url); // Depuración
+                        user.profilePicture = result.secure_url;
+                    } catch (uploadError) {
+                        console.error('Error subiendo a Cloudinary:', uploadError);
+                        return sendResponse(res, COD_ERR, 500, "Error al subir la imagen a Cloudinary");
+                    }
+                }
+
+                // Depuración antes de guardar
+                console.log('Usuario antes de guardar:', user);
+
+                await user.save();
+
+                // Depuración después de guardar
+                const updatedUser = await User.findById(user._id).select('-password');
+                console.log('Usuario después de guardar:', updatedUser);
+
+                return sendResponse(res, COD_OK, 200, "Perfil actualizado correctamente", updatedUser);
+            });
         });
     } catch (error) {
-        console.error(error); // Para ver los detalles del error
+        console.error(error);
         return sendResponse(res, COD_ERR, 500, "Error al actualizar el perfil", error.message);
     }
 };
 
 exports.getUsers = async (req, res) => {
     try {
-        const users = await User.find().select('-password'); // Excluir el campo password por seguridad
+        const users = await User.find().select('-password');
         return sendResponse(res, COD_OK, 200, "Lista de usuarios obtenida", users);
     } catch (error) {
         return sendResponse(res, COD_ERR, 500, "Error al obtener la lista de usuarios");
